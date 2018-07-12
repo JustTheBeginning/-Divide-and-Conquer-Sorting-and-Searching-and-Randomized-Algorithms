@@ -1,0 +1,135 @@
+#include <iostream>
+#include<vector>
+#include<cmath>
+#include<algorithm>
+#include<string>
+
+using namespace std;
+typedef vector<int> Vint;
+
+vector<int> addvectors(Vint a,Vint b); // FUNCTION TO ADD VECTORS
+void printvector(vector<int> a1); // FUNCTION TO PRINT A VECTOR
+Vint power(Vint v1, int raise); //FUNCTION TO RAISE THE POWER OF A VECTOR WITH BASE 10
+Vint Karatsuba(Vint k1, Vint k2); //KARATSUBA MULTIPLICATION
+Vint convert(string sample); //CONVERTS A STRING TO A VECTOR
+
+// MAIN PROGRAM
+int main()
+{
+    
+    string string1,string2;
+    string1="3141592653589793238462643383279502884197169399375105820974944592";
+    Vint first=convert(string1);// CONVERTING STRING TO A VECTOR
+    string2="2718281828459045235360287471352662497757247093699959574966967627";
+    Vint second=convert(string2);
+    
+    Vint answer=Karatsuba(first,second);
+    printvector(answer);
+    return 0;
+
+}
+
+// VECTOR PRINTING
+
+void printvector(Vint a1){
+
+for(int i=a1.size()-1;i>=0;i--){
+
+    cout<<a1[i];
+}
+cout<<endl;
+
+}
+
+// VECTOR ADDITION
+Vint addvectors(Vint a,Vint b){
+
+Vint c;
+if (a.size()>b.size()){b.resize(a.size(),0);
+c.resize(a.size()+1);}
+else{a.resize(b.size(),0);
+c.resize(b.size()+1);}
+
+
+for (int i=0;i<a.size();i++){
+    c[i]=c[i]+a[i]+b[i];
+    if (c[i]>9){
+        c[i+1]=1;
+        c[i]=c[i]%10;
+    }
+
+}
+return c;
+}
+
+// POWER FUNCTION
+Vint power(Vint v1, int const raise){
+    Vint::iterator it=v1.begin();
+    v1.insert(it,raise,0);
+    return v1;
+}
+
+
+// KARATSUBA
+
+
+Vint Karatsuba(Vint k1, Vint k2){
+    Vint result;
+    // for single digits- BASE CASE
+    if(k1.size()==1 && k2.size()==1){
+        int num_result=k1[0]*k2[0];
+        for(int i=1;i<3;i++){
+        result.push_back(fmod(num_result,(pow(10,i))));
+        num_result=num_result/10;
+        }
+        return result;
+    }
+    
+    //for more than 1 digits
+    
+    int counter=max(k1.size(),k2.size());
+    Vint a1,c1,b1,d1;
+    counter=counter/2; 
+    a1.resize(counter);//
+    b1.resize(counter);
+    c1.resize(counter);
+    d1.resize(counter);
+    int j=0;
+    int i=counter-1;
+    for(int j=counter-1;j>=0;j--,i--){
+        b1[i]=k1[j];
+        d1[i]=k2[j];
+    }
+    i=counter-1;
+    for(int j=counter*2-1;j>=counter;j--,i--){
+        a1[i]=k1[j];
+        c1[i]=k2[j];
+    }
+
+    counter=max(k1.size(),k2.size());
+    result=addvectors(addvectors(power(Karatsuba(a1,c1),counter),Karatsuba(b1,d1)),power(addvectors(Karatsuba(a1,d1),Karatsuba(b1,c1)),counter/2));
+    // THE ALGORITHM DOES NOT FOLLOW THE SUBTRACTION AS IT DOES NOT INVOLVE ANYTHING NEW IN TERMS OF WRITING CODE. USE THE SAME LOGIC AS THE FUNCTION WRITTEN TO ADD VECTORS
+    return result;
+}
+
+//CONVERT STRING TO ARRAY
+
+Vint convert(string sample){
+    reverse(sample.begin(),sample.end());
+    int array[64];
+    for(int i=0;i<sample.size();i++){
+        array[i]=sample[i]-'0';
+    }
+    return Vint(array,array + sizeof array/ sizeof array[0]);
+}
+
+
+
+
+
+
+
+
+
+
+
